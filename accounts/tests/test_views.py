@@ -15,26 +15,21 @@ class TestSignupAPIView(TestCase):
     def test_login_api_view(self):
         response = self.client.post(reverse('login'), data={'username': 'test213', 'password': 'test123321'},
                                     content_type='application/json')
-        print(response)
-        print(response.json())
+        self.assertEqual(response.status_code, 200)
 
     def test_signup_api_view_when_valid_credentials_then_200(self):
         response = self.client.post(reverse('signup'),
                                     data={'username': 'test111', 'password': 'test111', 'email': 'test111@email.com'})
         self.assertEqual(response.status_code, 201)
-        print(response)
-        print(response.json())
 
     def test_signup_api_view_with_existing_username_then_400(self):
         response = self.client.post(reverse('signup'),
                                     data={'username': 'test213', 'password': 'test111', 'email': 'test111@email.com'})
-        print(response, response.json())
         self.assertEqual(response.status_code, 400)
 
     def test_signup_api_view_with_existing_email_then_400(self):
         response = self.client.post(reverse('signup'),
                                     data={'username': 'test2132', 'password': 'test111', 'email': 'test213@email.com'})
-        print(response, response.json())
         self.assertEqual(response.status_code, 400)
 
     def test_signup_api_view_when_logged_in_then_403(self):
