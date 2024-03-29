@@ -7,9 +7,9 @@ from rest_framework.permissions import AllowAny
 
 schema_view = get_schema_view(
     openapi.Info(
-        title='Application PI',
+        title='Booking API',
         default_version='v1',
-        description='Application PI Description',
+        description='Description',
         contact=openapi.Contact(email='murekswork@gmail.com'),
     ),
     public=True,
