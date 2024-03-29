@@ -10,14 +10,17 @@ from rooms.models import Room
 
 class BookingQuerySet(models.QuerySet):
 
-    def get_intersections(self, checkin, checkout, room):
+    def get_intersections(self, checkin, checkout, room=None):
         """Method takes dates and room and checks for intersection in selected date"""
         lookup = (
             Q(checkin__lt=checkout) & Q(checkout__gt=checkin)) | (
             Q(checkin=checkin) & Q(checkout__gt=checkin)) | (
             Q(checkin__lt=checkout) & Q(checkout=checkout)
         )
-        qs = self.filter(room=room).filter(lookup)
+        qs = self
+        if room:
+            qs = self.filter(room=room)
+        qs = qs.filter(lookup)
         logging.warning(qs)
         return qs
 
@@ -27,32 +30,27 @@ class BookingManager(models.Manager):
     def get_queryset(self):
         return BookingQuerySet(self.model, using=self._db)
 
-    def get_intersections(self, checkin, checkout, room):
+    def get_intersections(self, checkin, checkout, room=None):
         active_bookings = self.get_queryset().filter(active=True)
         return active_bookings.get_intersections(checkin, checkout, room)
 
 
 class Booking(models.Model):
     user = models.ForeignKey(
-        get_user_model(),
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name='Бронирующий пользователь'
+        get_user_model(), on_delete=models.SET_NULL, null=True, verbose_name='Бронирующий пользователь'
     )
     room = models.ForeignKey(
-        Room,
-        null=True,
-        verbose_name='Забронированная комната',
-        related_name='bookings',
-        on_delete=models.CASCADE
+        Room, null=True, verbose_name='Забронированная комната', related_name='bookings', on_delete=models.CASCADE
     )
     checkin = models.DateField(
-        verbose_name='Дата начала брони'
+        verbose_name='Дата начала брони', db_index=True
     )
     checkout = models.DateField(
-        verbose_name='Дата конца брони'
+        verbose_name='Дата конца брони', db_index=True
     )
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(
+        default=True
+    )
     objects = BookingManager()
 
     class Meta:

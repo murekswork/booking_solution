@@ -3,7 +3,7 @@ from datetime import date
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.test import TestCase
 
 from booking.models import Booking
@@ -13,6 +13,9 @@ from rooms.models import Room
 class BookingModelTestCase(TestCase):
 
     def setUp(self):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT setval('rooms_room_id_seq', 1, false)")
+            cursor.execute("SELECT setval('rooms_room_id_seq', 1, false)")
         self.room = Room.objects.create(room_type=1, price=2500.2, spots=3)
         self.user = get_user_model().objects.create(username='test_user', email='test@mail.com')
         self.booking = Booking.objects.create(user=self.user, room=self.room, checkin=date(2024, 3, 5),
@@ -57,14 +60,6 @@ class BookingModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             Booking.objects.create(room=self.room, checkin='2024-03-1041',
                                    checkout=datetime.datetime.now() + datetime.timedelta(days=3))
-
-    # # TODO: Maybe should change logic that simple user cant edit booking status, but superuser can!
-    # def test_booking_model_status_can_not_be_updated_when_checkin_time_out(self):
-    #     self.booking.checkin = date.today() - datetime.timedelta(days=1)
-    #     self.booking.checkout = date.today() + datetime.timedelta(days=1)
-    #     self.booking.save()
-    #     with self.assertRaises(ValidationError):
-    #         self.booking.status = 0
 
     def test_booking_model_status_can_be_updated_when_checkout_time_came(self):
         self.booking.checkin = date.today() - datetime.timedelta(days=2)
@@ -113,3 +108,9 @@ class BookingManagerTestCase(TestCase):
         checkout = date.today()
         intersections = Booking.objects.get_intersections(checkin, checkout, self.room)
         self.assertEqual(len(intersections), 0)
+
+    def test_manager_get_intersections_method_when_equal_dates(self):
+        checkin = date.today()
+        checkout = date.today() + datetime.timedelta(days=7)
+        intersections = Booking.objects.get_intersections(checkin, checkout, self.room)
+        self.assertEqual(len(intersections), 1)
