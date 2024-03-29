@@ -47,7 +47,7 @@ class BookingRetrieveUpdateAPIView(UserQuerySetMixin, RetrieveUpdateAPIView):
     allow_superuser_view = True
     user_field = 'user'
     queryset = Booking.objects.all()
-    http_method_names = ('patch', )
+    http_method_names = ('patch', 'get',)
 
     @swagger_auto_schema(
         operation_summary='Change booking status',

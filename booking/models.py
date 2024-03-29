@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -12,16 +10,15 @@ class BookingQuerySet(models.QuerySet):
 
     def get_intersections(self, checkin, checkout, room=None):
         """Method takes dates and room and checks for intersection in selected date"""
-        lookup = (
+        lookup = ((
             Q(checkin__lt=checkout) & Q(checkout__gt=checkin)) | (
             Q(checkin=checkin) & Q(checkout__gt=checkin)) | (
-            Q(checkin__lt=checkout) & Q(checkout=checkout)
+            Q(checkin__lt=checkout) & Q(checkout=checkout))
         )
         qs = self
         if room:
             qs = self.filter(room=room)
         qs = qs.filter(lookup)
-        logging.warning(qs)
         return qs
 
 
