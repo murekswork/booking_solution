@@ -5,4 +5,4 @@ from rooms.models import Room
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('room_type', 'spots',)
+    list_display = ('id', 'room_type', 'spots',)

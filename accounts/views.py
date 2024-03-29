@@ -8,7 +8,6 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from accounts.authentication import TokenAuthentication
 from accounts.permissions import IsNotAuthenticated
 from accounts.serializers import UserLoginSerializer, UserSerializer
 
@@ -36,7 +35,6 @@ class LoginAPIView(GenericAPIView):
 
 class SignUpAPIView(GenericAPIView):
     permission_classes = [IsNotAuthenticated]
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
     serializer_class = UserSerializer
 
     @swagger_auto_schema(
