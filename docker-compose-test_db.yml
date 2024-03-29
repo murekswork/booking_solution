@@ -12,13 +12,13 @@ services:
     networks:
       - net
     depends_on:
-      - db
+      - test_db
   test_db:
     image: postgres:13
     volumes:
       - postgres_data_test:/var/lib/postgresql/data
     env_file:
-      - .env
+      - test.env
     ports:
       - 5432:5432
     networks:
