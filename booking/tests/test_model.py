@@ -52,8 +52,8 @@ class BookingModelTestCase(TestCase):
         self.assertFalse(b == ValidationError)
 
     def test_booking_model_save_when_invalid_room_then_raise_error(self):
-        with self.assertRaises(ValidationError):
-            Booking.objects.create(room=self.room, checkin=date(2024, 3, 5),
+        with self.assertRaises(Room.DoesNotExist):
+            Booking.objects.create(room_id=self.room.id + 10, checkin=date(2024, 3, 5),
                                    checkout=date(2024, 3, 8))
 
     def test_booking_model_save_when_invalid_date_then_raise_error(self):

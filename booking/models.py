@@ -40,17 +40,11 @@ class Booking(models.Model):
         get_user_model(), on_delete=models.SET_NULL, null=True, verbose_name='Бронирующий пользователь'
     )
     room = models.ForeignKey(
-        Room, null=True, verbose_name='Забронированная комната', related_name='bookings', on_delete=models.CASCADE
+        Room, null=True, verbose_name='Забронированная комната', related_name='bookings', on_delete=models.SET_NULL
     )
-    checkin = models.DateField(
-        verbose_name='Дата начала брони', db_index=True
-    )
-    checkout = models.DateField(
-        verbose_name='Дата конца брони', db_index=True
-    )
-    active = models.BooleanField(
-        default=True
-    )
+    checkin = models.DateField(verbose_name='Дата начала брони', db_index=True)
+    checkout = models.DateField(verbose_name='Дата конца брони', db_index=True)
+    active = models.BooleanField(verbose_name='Бронь активна', default=True)
     objects = BookingManager()
 
     class Meta:
@@ -64,15 +58,16 @@ class Booking(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.checkin} - {self.checkout}'
+        return f'{self.user}: {self.checkin} - {self.checkout}'
 
     def clean(self):
         super().clean()
-        existing_bookings = Booking.objects.get_intersections(self.checkin, self.checkout, self.room).exclude(
-            id=self.id)
+        existing_bookings = Booking.objects.get_intersections(
+            self.checkin, self.checkout, self.room).exclude(id=self.id)
         if existing_bookings.all():
             raise ValidationError('Выбранная дата уже занята!')
 
     def save(self, *args, **kwargs):
-        self.clean()
+        if self.active:
+            self.clean()
         super().save(*args, **kwargs)
