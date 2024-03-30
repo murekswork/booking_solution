@@ -12,7 +12,8 @@ services:
     networks:
       - net
     depends_on:
-      - db
+      db:
+        condition: service_started
   db:
     image: postgres:13
     volumes:

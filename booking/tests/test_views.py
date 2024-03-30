@@ -56,6 +56,23 @@ class TestListCreateBookingViewPost(TestListCreateBookingViewTestCaseSetupMixin)
                                     data={'room': self.room.id, 'checkin': '2024-03-25', 'checkout': '2024-03-26'})
         self.assertEqual(response.status_code, 409)
 
+    def test_view_authenticated_user_create_booking_with_invalid_room_then_raise_400(self):
+        self.client.force_login(self.user)
+        Booking.objects.create(room=self.room, checkin=date(2024, 3, 20),
+                               checkout=date(2024, 3, 30))
+        response = self.client.post(reverse('booking-create'),
+                                    data={'room': self.room.id + 3, 'checkin': '2024-03-25', 'checkout': '2024-03-26'})
+        self.assertEqual(response.status_code, 400)
+
+    def test_view_authenticated_user_create_booking_with_invalid_date_passed_then_raise_400(self):
+        self.client.force_login(self.user)
+        Booking.objects.create(room=self.room, checkin=date(2024, 3, 20),
+                               checkout=date(2024, 3, 30))
+        response = self.client.post(reverse('booking-create'),
+                                    data={'room': self.room.id, 'checkin': 'invalid_date', 'checkout': '2024-03-26'})
+        print(response.json(), response.status_code)
+        self.assertEqual(response.status_code, 400)
+
     def test_view_authenticated_user_create_booking_with_existing_date_inside_date_raise_409(self):
         self.client.force_login(self.user)
         Booking.objects.create(room=self.room, checkin=date(2024, 3, 25),
@@ -151,6 +168,8 @@ class BookingRetrieveUpdateAPIViewUpdateTestCase(BookingRetrieveUpdateAPIViewTes
         response = self.client.patch(reverse('booking-update', kwargs={'pk': self.booking.id}),
                                      data={'active': 'Invalid data'}, content_type='application/json')
         self.assertEqual(response.status_code, 400)
+        print(response.json())
+        self.assertEqual(response.json(), {'active': ['Must be a valid boolean.']})
 
     def test_authenticated_user_cant_patch_not_his_booking(self):
         self.client.force_login(self.user)
