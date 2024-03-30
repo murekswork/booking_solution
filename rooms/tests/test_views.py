@@ -46,6 +46,10 @@ class RoomsListAPIViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['results'], self.expected_data['results'][::-1])
 
+    def test_view_sort_by_price_invalid_price_then_raise_400(self):
+        response = self.client.get(reverse('rooms') + '?order_by=garbage')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_view_sort_by_spots(self):
         response = self.client.get(reverse('rooms') + '?order_by=spots')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -55,6 +59,10 @@ class RoomsListAPIViewTestCase(TestCase):
         response = self.client.get(reverse('rooms') + '?order_by=-spots')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['results'], self.expected_data['results'][::-1])
+
+    def test_view_sort_by_invalid_data_then_raise_400(self):
+        response = self.client.get(reverse('rooms') + '?order_by=fsas2421')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_view_filter_by_price_gte(self):
         response = self.client.get(reverse('rooms') + '?price_gte=2000')
@@ -66,6 +74,10 @@ class RoomsListAPIViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['results'], list(self.expected_data['results'][:2]))
 
+    def test_view_filter_by_price_invalid_price_then_raise_400(self):
+        response = self.client.get(reverse('rooms') + '?price_gte=dasdasd')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_view_filter_by_spots_gte(self):
         response = self.client.get(reverse('rooms') + '?spots_gte=2')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -75,6 +87,10 @@ class RoomsListAPIViewTestCase(TestCase):
         response = self.client.get(reverse('rooms') + '?spots_lte=1')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()['results'], list(self.expected_data['results'][:1]))
+
+    def test_view_filter_by_spots_invalid_spots_then_raise_400(self):
+        response = self.client.get(reverse('rooms') + '?spots_gte=dsafafs')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_view_filter_by_spots_and_sort_by_price_desc(self):
         response = self.client.get(reverse('rooms') + '?spots_gte=3&order_by=-price')
