@@ -17,7 +17,7 @@ class LoginAPIView(GenericAPIView):
     serializer_class = UserLoginSerializer
 
     @swagger_auto_schema(
-        operation_summary='Log in into account',
+        operation_summary='Login',
         operation_description='Log in and get auth token',
         responses={403: 'cant login because user already logged in ',
                    400: 'invalid credentials or not credentials provided', }
@@ -29,7 +29,7 @@ class LoginAPIView(GenericAPIView):
         if user:
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)
-            return JsonResponse({'msg': 'successfully authenticated', 'token': token.key}, status=status.HTTP_200_OK)
+            return JsonResponse({'msg': 'successfully logged in', 'token': token.key}, status=status.HTTP_200_OK)
         return JsonResponse({'detail': 'invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -50,7 +50,7 @@ class SignUpAPIView(GenericAPIView):
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer.save()
-        return JsonResponse({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+        return JsonResponse({'message': 'user created successfully'}, status=status.HTTP_201_CREATED)
 
 
 class LogoutAPIView(APIView):
