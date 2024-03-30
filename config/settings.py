@@ -1,13 +1,6 @@
 import os
 from pathlib import Path
 
-# TODO: DELETE THIS
-
-with open('.env') as f:
-    for line in f:
-        key, value = line.strip().split('=', maxsplit=1)
-        os.environ[key] = value
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
