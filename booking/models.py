@@ -49,11 +49,11 @@ class Booking(models.Model):
         get_user_model(), on_delete=models.SET_NULL, null=True, verbose_name='Бронирующий пользователь'
     )
     room = models.ForeignKey(
-        Room, null=True, verbose_name='Забронированная комната', related_name='bookings', on_delete=models.SET_NULL
+        Room, null=True, related_name='bookings', on_delete=models.SET_NULL, verbose_name='Забронированная комната'
     )
-    checkin = models.DateField(verbose_name='Дата начала брони', db_index=True)
-    checkout = models.DateField(verbose_name='Дата конца брони', db_index=True)
-    active = models.BooleanField(verbose_name='Бронь активна', default=True)
+    checkin = models.DateField(db_index=True, verbose_name='Дата начала брони')
+    checkout = models.DateField(db_index=True, verbose_name='Дата конца брони')
+    active = models.BooleanField(default=True, verbose_name='Бронь активна')
     objects = BookingManager()
 
     class Meta:

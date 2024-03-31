@@ -5,7 +5,7 @@ from django.urls import reverse
 from rooms.models import Room
 
 
-class TestSignupAPIView(TestCase):
+class TestSignupAPIViewTestCase(TestCase):
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username='test213', email='test213@email.com')
