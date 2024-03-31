@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 
 import django_filters
+from django.db.models import QuerySet
 from rest_framework.exceptions import ValidationError
 
 from booking.models import Booking
@@ -16,7 +17,7 @@ class RoomFilter(django_filters.FilterSet):
     checkin = django_filters.DateFilter(method='get_available_rooms', field_name='available_rooms', )
     checkout = django_filters.DateFilter(method='get_available_rooms', field_name='available_rooms', )
 
-    def get_available_rooms(self, qs, *args):
+    def get_available_rooms(self, qs, *args) -> QuerySet:
         """
         A method to filter available rooms based on check-in and check-out query params.
         Firstly we check if check-in param is in the request. If it is convert

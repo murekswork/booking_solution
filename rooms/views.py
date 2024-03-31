@@ -23,7 +23,7 @@ class RoomListAPIView(ListAPIView):
         operation_description='Room list view with different filters',
         responses={400: 'invalid filter field passed'}
     )
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> JsonResponse:
         try:
             return super().get(request, *args, **kwargs)
         except ValidationError as exc:
