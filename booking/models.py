@@ -1,14 +1,21 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import F, Q, QuerySet
 
 from rooms.models import Room
 
 
 class BookingQuerySet(models.QuerySet):
 
-    def get_intersections(self, checkin, checkout, room=None):
+    def get_intersections(
+            self,
+            checkin: datetime.date,
+            checkout: datetime.datetime,
+            room: Room | None = None
+    ) -> QuerySet:
         """Method takes dates and room and checks for bookings in selected date"""
         lookup = ((
             Q(checkin__lt=checkout) & Q(checkout__gt=checkin)) | (
@@ -24,10 +31,15 @@ class BookingQuerySet(models.QuerySet):
 
 class BookingManager(models.Manager):
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         return BookingQuerySet(self.model, using=self._db)
 
-    def get_intersections(self, checkin, checkout, room=None):
+    def get_intersections(
+            self,
+            checkin: datetime.date,
+            checkout: datetime.date,
+            room: Room | None = None
+    ) -> QuerySet:
         active_bookings = self.get_queryset().filter(active=True)
         return active_bookings.get_intersections(checkin, checkout, room)
 

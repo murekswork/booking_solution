@@ -4,6 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from booking.models import Booking
 from booking.serializers import BookingSerializer, BookingSerializerUpdateStatusOnly
@@ -16,7 +17,7 @@ class BookingListCreateAPIView(UserQuerySetMixin, ListCreateAPIView):
     queryset = Booking.objects.all()
     allow_superuser_view = False
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)
 
     @swagger_auto_schema(
@@ -25,7 +26,7 @@ class BookingListCreateAPIView(UserQuerySetMixin, ListCreateAPIView):
         responses={403: 'not logged in',
                    409: 'dates are already taken'}
     )
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> JsonResponse:
         try:
             return super().post(request, *args, **kwargs)
         except ValidationError:
@@ -36,7 +37,7 @@ class BookingListCreateAPIView(UserQuerySetMixin, ListCreateAPIView):
         operation_description='List of authenticated users bookings',
         responses={403: 'not logged in'}
     )
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> Response:
         return super().get(request, *args, **kwargs)
 
 
@@ -56,5 +57,5 @@ class BookingRetrieveUpdateAPIView(UserQuerySetMixin, RetrieveUpdateAPIView):
                    404: 'no booking matching given query found',
                    403: 'not logged in'}
     )
-    def patch(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs) -> Response:
         return super().patch(request, *args, **kwargs)

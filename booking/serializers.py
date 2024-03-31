@@ -12,6 +12,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingSerializerUpdateStatusOnly(serializers.ModelSerializer):
     class Meta:
-        read_only_fields = ('room', 'checkin', 'checkout',)
         model = Booking
+        read_only_fields = ('room', 'checkin', 'checkout',)
         fields = ('room', 'checkin', 'checkout', 'active')
