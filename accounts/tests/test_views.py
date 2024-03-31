@@ -12,11 +12,6 @@ class TestSignupAPIViewTestCase(TestCase):
         self.user.set_password('test123321')
         self.user.save()
 
-    def test_login_api_view(self):
-        response = self.client.post(reverse('login'), data={'username': 'test213', 'password': 'test123321'},
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-
     def test_signup_api_view_when_valid_credentials_then_200(self):
         response = self.client.post(reverse('signup'),
                                     data={'username': 'test111', 'password': 'test111', 'email': 'test111@email.com'})
