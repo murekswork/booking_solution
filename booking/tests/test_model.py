@@ -87,7 +87,6 @@ class BookingManagerTestCase(TestCase):
     def test_manager_get_intersections_method_when_checkout_between_existing_checkin_and_checkout(self):
         checkin = date.today() - datetime.timedelta(days=2)
         checkout = date.today() + datetime.timedelta(days=2)
-        print(checkin, checkout)
         intersections = Booking.objects.get_intersections(checkin, checkout, self.room)
         self.assertEqual(len(intersections), 1)
 
