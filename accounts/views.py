@@ -22,7 +22,7 @@ class LoginAPIView(GenericAPIView):
         responses={403: 'cant login because user already logged in ',
                    400: 'invalid credentials or not credentials provided', }
     )
-    def post(self, request):
+    def post(self, request) -> JsonResponse:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
@@ -43,14 +43,13 @@ class SignUpAPIView(GenericAPIView):
         responses={403: 'cant signup because user already logged in',
                    400: 'invalid credentials or username and email are taken'}
     )
-    def post(self, request):
+    def post(self, request) -> JsonResponse:
         self.check_permissions(request)
         serializer = UserSerializer(data=request.data)
-        if not serializer.is_valid():
-            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer.save()
-        return JsonResponse({'message': 'user created successfully'}, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({'message': 'user created successfully'}, status=status.HTTP_201_CREATED)
+        return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutAPIView(APIView):
@@ -62,6 +61,6 @@ class LogoutAPIView(APIView):
         operation_description='Sign out from account',
         responses={403: 'cant logout because user is not logged in'}
     )
-    def post(self, request):
+    def post(self, request) -> JsonResponse:
         logout(request)
         return JsonResponse({'message': 'successfully logged out'}, status=200)
