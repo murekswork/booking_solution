@@ -9,7 +9,7 @@ from rooms.models import Room
 class BookingQuerySet(models.QuerySet):
 
     def get_intersections(self, checkin, checkout, room=None):
-        """Method takes dates and room and checks for intersection in selected date"""
+        """Method takes dates and room and checks for bookings in selected date"""
         lookup = ((
             Q(checkin__lt=checkout) & Q(checkout__gt=checkin)) | (
             Q(checkin=checkin) & Q(checkout__gt=checkin)) | (

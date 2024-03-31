@@ -1,6 +1,7 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import django_filters
+from rest_framework.exceptions import ValidationError
 
 from booking.models import Booking
 from rooms.models import Room
@@ -16,15 +17,28 @@ class RoomFilter(django_filters.FilterSet):
     checkout = django_filters.DateFilter(method='get_available_rooms', field_name='available_rooms', )
 
     def get_available_rooms(self, qs, *args):
+        """
+        A method to filter available rooms based on check-in and check-out query params.
+        Firstly we check if check-in param is in the request. If it is convert
+        string to a datetime object - otherwise, set today's date as the check-in date.
+        Then try to parse check-out date, but if it is not found, set check-in + 1 day as the default value.
+        """
         checkin = self.request.query_params.get('checkin', date.today())
-        checkout = self.request.query_params.get('checkout', date.today())
         if isinstance(checkin, str):
             checkin = datetime.strptime(checkin, '%Y-%m-%d').date()
+
+        checkout = self.request.query_params.get('checkout', checkin + timedelta(days=1))
         if isinstance(checkout, str):
             checkout = datetime.strptime(checkout, '%Y-%m-%d').date()
-        booked_ids = Booking.objects.get_intersections(checkin, checkout).values('room')
-        if booked_ids:
-            qs = qs.exclude(id__in=booked_ids)
+
+        if checkin == checkout:
+            raise ValidationError('checkout date can not be equal to checkin date')
+        elif checkin > checkout:
+            raise ValidationError('checkin date cant be lower than checkout date')
+
+        booked_rooms_ids = Booking.objects.get_intersections(checkin, checkout).values('room')
+        if booked_rooms_ids:
+            qs = qs.exclude(id__in=booked_rooms_ids)
         return qs
 
     order_by = django_filters.OrderingFilter(
