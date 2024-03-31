@@ -12,10 +12,9 @@ cd booking_solution
 docker-compose up --build
 ```
 Приложение будет доступно по адресу:
-```
-localhost:8000/
 
-```
+http://localhost:8000/
+
 
 Для запуска тестов ввести:
 ```
